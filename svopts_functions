@@ -85,6 +85,6 @@ disable(){
 }
 
 list(){
-	ls -la "$serv_path"
+	ls "$serv_path"
 	exit 0
 }
