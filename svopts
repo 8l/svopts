@@ -1,0 +1,43 @@
+#!/bin/sh
+# This script is under license BEER-WARE
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <eric@obarun.org> wrote this file.  As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return.   Eric Vidal
+
+#set -e
+
+. /etc/runit/svopts/svopts.conf
+. /etc/runit/svopts/svopts_functions
+
+if [ -z $2 ] && [ $1 != "list" ]; then
+	echo_info " Please, define a service name"
+	echo_bold " Usage: $0 {enable|disable|list} service_name"
+	exit 1
+fi
+
+(( EUID == 0 )) || die " You must be run this script with root privileges"
+
+name=$2
+running=$serv_path/$name 
+exist=$conf_path/$name 
+
+case "$1" in
+	enable)
+		enable
+		;;
+
+	disable)
+		disable
+		;;
+	
+	list)
+		list
+		;;
+
+	*)
+		echo_bold "usage: $0 {enable|disable|list} service_name"
+esac
+exit 0
+
+# vim:set ts=2 sw=2 et:

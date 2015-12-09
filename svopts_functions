@@ -1,0 +1,90 @@
+#!/bin/sh
+
+#set -e
+
+. /etc/runit/svopts.conf
+
+##		Shell color 
+
+bold=$(tput bold)
+reset=$(tput sgr0)
+red=$(tput setaf 1)
+bred=${bold}$(tput setaf 1)
+green=$(tput setaf 2)
+bgreen=${bold}$(tput setaf 2)
+yellow=$(tput setaf 3)
+byellow=${bold}$(tput setaf 3)
+blue=$(tput setaf 4)
+bblue=${bold}$(tput setaf 4)
+
+
+## 		Information display by the script 
+
+echo_bold(){
+	echo "${bold}${1}${reset}"
+}
+echo_info(){
+	echo "${byellow}==>>${1}${reset}"
+}
+echo_retry(){
+	echo "${bblue}==>>${1}${reset}"
+}
+echo_valid(){
+	echo "${bgreen}==>>${1}${reset}"
+}
+echo_display(){
+	echo "${bold}==>>${1}${reset}"
+}
+echo_exit(){
+	echo "${bred}==>>${1}${reset}"
+}	
+answer(){
+	echo_retry " Please answer y or n :"
+}
+
+die (){
+      local message code 
+      message="$1"
+      [[ -n "$2" ]] && code="$2" || code=1
+      if [[ -n "$message" ]] ; then
+        echo_exit " ${message}; exit status ${code}"
+      else
+        echo_exit " exiting with status ${code}"
+      fi
+      exit 1
+}
+
+get_pid() {
+	pidof -o %PPID $name
+}
+
+enable(){
+	if [ -h "$running" ]; then
+		echo_info " Already enabled, nothing to do"
+		exit 0
+	else
+		if [ -d "$exist" ]; then
+			echo_info " Enable $name"
+			ln -s "$conf_path/$name $serv_path"
+		else
+			echo_exit " This service is not available"
+		fi
+	fi
+	exit 0
+}
+
+disable(){
+	if ! [ -h "$running" ]; then
+		echo_info " Not enabled"
+		exit 0
+	else
+		echo_info " Disable $name"
+		rm "$serv_path/$name"
+	fi
+	exit 0
+}
+
+list(){
+	ls -la "$serv_path"
+	exit 0
+}

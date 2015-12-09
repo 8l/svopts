@@ -1,0 +1,31 @@
+A scripts to provide option for runit sv software
+usage example :
+$ svopts enable cups
+$ svopts disable cups
+$ svopts list 
+
+The list options is just a list from the directory /var/service. The service can be down or up, don't matter.
+
+License
+=======
+
+This script is under license BEER-WARE
+"THE BEER-WARE LICENSE" (Revision 42):
+<eric@obarun.org> wrote this file.  As long as you retain this notice you
+can do whatever you want with this stuff. If we meet some day, and you think
+this stuff is worth it, you can buy me a beer in return.   Eric Vidal
+
+Todo
+===========
+
+Creating service on the fly
+Automatization of service pkgbuild
+
+Other words
+===========
+
+Please if you like it or find a bugs or need more information, give a feedback on :
+
+http://obarun.org/forum
+
+enjoy it :)
