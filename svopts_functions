@@ -2,7 +2,7 @@
 
 #set -e
 
-. /etc/runit/svopts.conf
+. /etc/runit/svopts/svopts.conf
 
 ##		Shell color 
 
