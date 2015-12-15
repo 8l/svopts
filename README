@@ -3,6 +3,7 @@ usage example :
 $ svopts enable cups
 $ svopts disable cups
 $ svopts list 
+$ svopts create cups
 
 The list options is just a list from the directory /var/service. The service can be down or up, don't matter.
 
@@ -18,7 +19,6 @@ this stuff is worth it, you can buy me a beer in return.   Eric Vidal
 Todo
 ===========
 
-Creating service on the fly
 Automatization of service pkgbuild
 
 Other words

@@ -34,9 +34,12 @@ case "$1" in
 	list)
 		list
 		;;
+	create)
+		create
+		;;
 
 	*)
-		echo_bold "usage: $0 {enable|disable|list} service_name"
+		echo_bold "usage: $0 {enable|disable|list|create} service_name"
 esac
 exit 0
 

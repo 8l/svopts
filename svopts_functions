@@ -42,6 +42,13 @@ answer(){
 	echo_retry " Please answer y or n :"
 }
 
+##		define some variables
+
+#file=""
+#logfile=""
+
+## 		common functions
+
 die (){
       local message code 
       message="$1"
@@ -57,6 +64,12 @@ die (){
 get_pid() {
 	pidof -o %PPID $name
 }
+
+check_elements(){
+	for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
+}
+
+##		main fonction
 
 enable(){
 	if [ -h "$running" ]; then
@@ -88,3 +101,85 @@ list(){
 	ls "$serv_path"
 	exit 0
 }
+
+create(){
+	
+	#check if base-runitserv exist
+	if ! [ -d /etc/runit/svopts/base-runitserv ]; then
+		echo_exit " The base directory for create a service doesn't exist"
+		exit 0
+	fi
+	# service exist or not
+	check_dir
+	
+	#copy file to /etc/sv
+	cp_base
+	
+	#rename file	
+	rename_file
+	
+	#edit files
+	edit_file
+}
+
+#edit(){
+#	edit_file
+#}
+
+##		sub functions
+
+check_dir(){
+	if [ -d "$conf_path/$name" ]; then
+		echo_exit " $name already exist, choose an another name"
+		exit 1
+	fi
+}
+
+cp_base(){
+	cp -r /etc/runit/svopts/base-runitserv "$conf_path/$name"
+	chmod 0755 "$conf_path/$name/"{run,finish,check}
+	chmod 0755 "$conf_path/$name/log/run"
+	mkdir -p -m 0755 /var/log/"$name"
+	mv "$conf_path/$name/log/config" /var/log/"$name"/config
+	chmod 0644 /var/log/"$name"/config
+}
+
+rename_file(){
+	for i in "$conf_path/$name/log/*"; do
+		sed -i "s:base:$name:g" $i
+	done
+}
+	
+edit_file(){
+	file_list=$(ls -d --group-directories-first $conf_path/$name/* | awk -F "$conf_path/$name/" '{ print $2 }' | uniq)
+	file_list+=" Exit"
+	select file in $file_list; do
+		case $file in 
+			Exit)exit 0
+			break;;
+			*)if check_elements "$file" $file_list; then
+				if [[  -d "$conf_path/$name/$file" ]]; then
+					log_list=$(ls $conf_path/$name/$file/* | awk -F "$conf_path/$name/$file/" '{ print $2 }') 
+					log_list+=" Exit"
+					select logfile in $log_list; do
+						case $logfile in
+							Exit)edit_file
+								break;;
+							*)if check_elements "$logfile" $log_list; then
+								"$editor" "$conf_path/$name/log/$logfile"
+							else
+								echo_retry " Invalid number, retry :"
+							fi
+						esac
+					done
+				else
+					"$editor" "$conf_path/$name/$file"
+					edit_file
+				fi	
+			else 
+				echo_retry " Invalid number, retry :"
+			fi
+		esac
+	done
+}
+
