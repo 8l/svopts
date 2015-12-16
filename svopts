@@ -10,19 +10,19 @@
 . /etc/runit/svopts/svopts.conf
 . /etc/runit/svopts/svopts_functions
 
-if [ -z $2 ] && [ $1 != "list" ]; then
+if [ -z "${2}" ] && [ "${1}" != "list" ]; then
 	echo_info " Please, define a service name"
-	echo_bold " Usage: $0 {enable|disable|list} service_name"
+	echo_bold " Usage: ${0} {enable|disable|list} service_name"
 	exit 1
 fi
 
 (( EUID == 0 )) || die " You must be run this script with root privileges"
 
-name=$2
-running=$serv_path/$name 
-exist=$conf_path/$name 
+name="${2}"
+running="${serv_path}/${name}" 
+exist="${conf_path}/${name}"
 
-case "$1" in
+case "${1}" in
 	enable)
 		enable
 		;;
@@ -39,7 +39,7 @@ case "$1" in
 		;;
 
 	*)
-		echo_bold "usage: $0 {enable|disable|list|create} service_name"
+		echo_bold "usage: ${0} {enable|disable|list|create} service_name"
 esac
 exit 0
 

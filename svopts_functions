@@ -51,8 +51,8 @@ answer(){
 
 die (){
       local message code 
-      message="$1"
-      [[ -n "$2" ]] && code="$2" || code=1
+      message="${1}"
+      [[ -n "${2}" ]] && code="${2}" || code=1
       if [[ -n "$message" ]] ; then
         echo_exit " ${message}; exit status ${code}"
       else
@@ -66,19 +66,19 @@ get_pid() {
 }
 
 check_elements(){
-	for e in "${@:2}"; do [[ $e == $1 ]] && break; done;
+	for e in "${@:2}"; do [[ "${e}" == "${1}" ]] && break; done;
 }
 
 ##		main fonction
 
 enable(){
-	if [ -h "$running" ]; then
+	if [ -h "${running}" ]; then
 		echo_info " Already enabled, nothing to do"
 		exit 0
 	else
-		if [ -d "$exist" ]; then
-			echo_info " Enable $name"
-			ln -s "$conf_path/$name $serv_path"
+		if [ -d "${exist}" ]; then
+			echo_info " Enable ${name}"
+			ln -s "${conf_path}/${name}" "${serv_path}"
 		else
 			echo_exit " This service is not available"
 		fi
@@ -87,18 +87,18 @@ enable(){
 }
 
 disable(){
-	if ! [ -h "$running" ]; then
+	if ! [ -h "${running}" ]; then
 		echo_info " Not enabled"
 		exit 0
 	else
-		echo_info " Disable $name"
-		rm "$serv_path/$name"
+		echo_info " Disable ${name}"
+		rm "${serv_path}/${name}"
 	fi
 	exit 0
 }
 
 list(){
-	ls "$serv_path"
+	ls "${serv_path}"
 	exit 0
 }
 
@@ -129,51 +129,51 @@ create(){
 ##		sub functions
 
 check_dir(){
-	if [ -d "$conf_path/$name" ]; then
-		echo_exit " $name already exist, choose an another name"
+	if [ -d "${conf_path}/${name}" ]; then
+		echo_exit " ${name} already exist, choose an another name"
 		exit 1
 	fi
 }
 
 cp_base(){
-	cp -r /etc/runit/svopts/base-runitserv "$conf_path/$name"
-	chmod 0755 "$conf_path/$name/"{run,finish,check}
-	chmod 0755 "$conf_path/$name/log/run"
-	mkdir -p -m 0755 /var/log/"$name"
-	mv "$conf_path/$name/log/config" /var/log/"$name"/config
-	chmod 0644 /var/log/"$name"/config
+	cp -r /etc/runit/svopts/base-runitserv "${conf_path}/${name}"
+	chmod 0755 "${conf_path}/${name}/"{run,finish,check}
+	chmod 0755 "${conf_path}/${name}/log/run"
+	mkdir -p -m 0755 /var/log/"${name}"
+	mv "${conf_path}/${name}/log/config" "/var/log/${name}/config"
+	chmod 0644 "/var/log/${name}/config"
 }
 
 rename_file(){
-	for i in "$conf_path/$name/log/*"; do
-		sed -i "s:base:$name:g" $i
+	for i in "${conf_path}/${name}/log/*"; do
+		sed -i "s:base:${name}:g" $i
 	done
 }
 	
 edit_file(){
 	file_list=$(ls -d --group-directories-first $conf_path/$name/* | awk -F "$conf_path/$name/" '{ print $2 }' | uniq)
 	file_list+=" Exit"
-	select file in $file_list; do
-		case $file in 
+	select file in ${file_list}; do
+		case "${file}" in 
 			Exit)exit 0
 			break;;
-			*)if check_elements "$file" $file_list; then
-				if [[  -d "$conf_path/$name/$file" ]]; then
+			*)if check_elements ${file} ${file_list}; then
+				if [[  -d "${conf_path}/${name}/${file}" ]]; then
 					log_list=$(ls $conf_path/$name/$file/* | awk -F "$conf_path/$name/$file/" '{ print $2 }') 
 					log_list+=" Exit"
-					select logfile in $log_list; do
-						case $logfile in
+					select logfile in ${log_list}; do
+						case "${logfile}" in
 							Exit)edit_file
 								break;;
-							*)if check_elements "$logfile" $log_list; then
-								"$editor" "$conf_path/$name/log/$logfile"
+							*)if check_elements ${logfile} ${log_list}; then
+								"${editor}" "${conf_path}/${name}/log/${logfile}"
 							else
 								echo_retry " Invalid number, retry :"
 							fi
 						esac
 					done
 				else
-					"$editor" "$conf_path/$name/$file"
+					"${editor}" "${conf_path}/${name}/${file}"
 					edit_file
 				fi	
 			else 
